@@ -1,0 +1,261 @@
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AdvancedExecutorUI"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+-- Tạo Frame chính (UI hình chữ nhật)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 600, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 15)
+corner.Parent = mainFrame
+
+-- Thanh tiêu đề
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 25)
+titleBar.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 15)
+titleCorner.Parent = titleBar
+
+local titleText = Instance.new("TextLabel")
+titleText.Size = UDim2.new(0, 200, 1, 0)
+titleText.Position = UDim2.new(0, 10, 0, 0)
+titleText.BackgroundTransparency = 1
+titleText.Text = "QuackH4 Executor"
+titleText.Font = Enum.Font.Gotham
+titleText.TextSize = 16
+titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleText.Parent = titleBar
+
+-- Text Editor
+local textEditor = Instance.new("TextBox")
+textEditor.Size = UDim2.new(1, -20, 0.9, -25)
+textEditor.Position = UDim2.new(0, 10, 0, 30)
+textEditor.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+textEditor.TextColor3 = Color3.fromRGB(255, 255, 255)
+textEditor.Text = "print(\"QuackH4 executor\")"
+textEditor.TextWrapped = true
+textEditor.ClearTextOnFocus = false
+textEditor.Font = Enum.Font.Gotham
+textEditor.TextSize = 16
+textEditor.TextXAlignment = Enum.TextXAlignment.Left
+textEditor.TextYAlignment = Enum.TextYAlignment.Top
+textEditor.BackgroundTransparency = 0
+textEditor.BorderSizePixel = 0
+textEditor.Parent = mainFrame
+
+-- Nút thu nhỏ
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Size = UDim2.new(0, 20, 0, 20)
+minimizeButton.Position = UDim2.new(1, -45, 0, 3)
+minimizeButton.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+minimizeButton.Text = "-"
+minimizeButton.Font = Enum.Font.Gotham
+minimizeButton.TextSize = 18
+minimizeButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+minimizeButton.Parent = titleBar
+
+local minCorner = Instance.new("UICorner")
+minCorner.CornerRadius = UDim.new(0, 10)
+minCorner.Parent = minimizeButton
+
+-- Nút đóng
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0, 20, 0, 20)
+closeButton.Position = UDim2.new(1, -20, 0, 3)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+closeButton.Text = "X"
+closeButton.Font = Enum.Font.Gotham
+closeButton.TextSize = 18
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Parent = titleBar
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0, 10)
+closeCorner.Parent = closeButton
+
+-- Dịch chuyển mượt mà cho Frame chính
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local dragging, dragStart, startPos
+
+titleBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
+        startPos = mainFrame.Position
+    end
+end)
+
+titleBar.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = false
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if dragging then
+        local mouse = UserInputService:GetMouseLocation()
+        local delta = mouse - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+-- Logic nút thu nhỏ
+local isMinimized = false
+minimizeButton.MouseButton1Click:Connect(function()
+    isMinimized = not isMinimized
+    if isMinimized then
+        mainFrame.Size = UDim2.new(0, 600, 0, 25)
+        textEditor.Visible = false
+    else
+        mainFrame.Size = UDim2.new(0, 600, 0, 400)
+        textEditor.Visible = true
+    end
+end)
+
+-- Logic nút đóng
+closeButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+end)
+
+-- Nút Toggle
+local toggleButton = Instance.new("ImageButton")
+toggleButton.Size = UDim2.new(0, 50, 0, 50)
+toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+toggleButton.Image = "http://www.roblox.com/asset/?id=74685297119537"
+toggleButton.ScaleType = Enum.ScaleType.Fit
+toggleButton.Parent = screenGui
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 10)
+toggleCorner.Parent = toggleButton
+
+local toggleDragging, toggleDragStart, toggleStartPos
+
+toggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        toggleDragging = true
+        toggleDragStart = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
+        toggleStartPos = toggleButton.Position
+    end
+end)
+
+toggleButton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        toggleDragging = false
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    if toggleDragging then
+        local mouse = UserInputService:GetMouseLocation()
+        local delta = mouse - toggleDragStart
+        local screenSize = screenGui.AbsoluteSize
+        local newX = toggleStartPos.X.Offset + delta.X
+        local newY = toggleStartPos.Y.Offset + delta.Y
+        newX = math.clamp(newX, 0, screenSize.X - toggleButton.AbsoluteSize.X)
+        newY = math.clamp(newY, 0, screenSize.Y - toggleButton.AbsoluteSize.Y)
+        toggleButton.Position = UDim2.new(toggleStartPos.X.Scale, newX, toggleStartPos.Y.Scale, newY)
+    end
+end)
+
+local isVisible = true
+toggleButton.MouseButton1Click:Connect(function()
+    isVisible = not isVisible
+    mainFrame.Visible = isVisible
+end)
+
+-- Nút Execute
+local executeButton = Instance.new("TextButton")
+executeButton.Size = UDim2.new(0, 80, 0, 25)
+executeButton.Position = UDim2.new(0, 10, 1, -35)
+executeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+executeButton.Text = "Execute"
+executeButton.Font = Enum.Font.Gotham
+executeButton.TextSize = 14
+executeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+executeButton.Parent = mainFrame
+
+local executeCorner = Instance.new("UICorner")
+executeCorner.CornerRadius = UDim.new(0, 10)
+executeCorner.Parent = executeButton
+
+-- Nút Clear
+local clearButton = Instance.new("TextButton")
+clearButton.Size = UDim2.new(0, 80, 0, 25)
+clearButton.Position = UDim2.new(0, 100, 1, -35)
+clearButton.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+clearButton.Text = "Clear"
+clearButton.Font = Enum.Font.Gotham
+clearButton.TextSize = 14
+clearButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+clearButton.Parent = mainFrame
+
+local clearCorner = Instance.new("UICorner")
+clearCorner.CornerRadius = UDim.new(0, 10)
+clearCorner.Parent = clearButton
+
+-- Thêm Label "Injected" màu xanh lá cây
+local injectedLabel = Instance.new("TextLabel")
+injectedLabel.Size = UDim2.new(0, 80, 0, 25) -- Kích thước giống các nút Execute và Clear
+injectedLabel.Position = UDim2.new(0, 190, 1, -35) -- Nằm bên phải nút Clear, cách 10px
+injectedLabel.BackgroundTransparency = 1 -- Không nền
+injectedLabel.Text = "Injected"
+injectedLabel.Font = Enum.Font.Gotham
+injectedLabel.TextSize = 14
+injectedLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- Màu xanh lá cây
+injectedLabel.Parent = mainFrame
+
+clearButton.MouseButton1Click:Connect(function()
+    textEditor.Text = ""
+end)
+
+executeButton.MouseButton1Click:Connect(function()
+    local scriptText = textEditor.Text
+    if scriptText and scriptText ~= "" then
+        local success, errorMsg = pcall(function()
+            loadstring(scriptText)()
+        end)
+        if not success then
+            warn("Lỗi khi chạy script: " .. errorMsg)
+        end
+    end
+end)
+
+-- Hiệu ứng Hover
+local function addHoverEffect(button, hoverColor)
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = hoverColor
+    end)
+    button.MouseLeave:Connect(function()
+        if button == minimizeButton then
+            button.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+        elseif button == closeButton then
+            button.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        elseif button == toggleButton then
+            button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        elseif button == executeButton then
+            button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+        elseif button == clearButton then
+            button.BackgroundColor3 = Color3.fromRGB(150, 50, 50)
+        end
+    end)
+end
+
+addHoverEffect(minimizeButton, Color3.fromRGB(255, 220, 100))
+addHoverEffect(closeButton, Color3.fromRGB(220, 0, 0))
+addHoverEffect(toggleButton, Color3.fromRGB(100, 100, 100))
+addHoverEffect(executeButton, Color3.fromRGB(120, 120, 120))
+addHoverEffect(clearButton, Color3.fromRGB(180, 70, 70))
